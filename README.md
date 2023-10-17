@@ -1,6 +1,6 @@
-A collaborative project of creating our own printf implementationin C.
+## A collaborative project of creating our own printf implementation in C.
 
-Collaborators:
+**Collaborators**:
 * Lina Toumi
 * Mathias Bala
 
