@@ -53,7 +53,3 @@ int _printf(const char *format, ...) {
     va_end(list_of_args);
     return total_char_to_print;
 }
-
-  va_end(list_of_args);
-  return total_char_to_print;
-}
