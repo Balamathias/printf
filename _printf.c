@@ -1,90 +1,62 @@
 #include "main.h"
-#include <stdio.h>
 
 /**
-* _printf - prints a string
-* @format: the format string
-* Return: the number of characters printed
-*/
+  * _printf - prints a string
+  * @format: the format string
+  * Return: the number of characters printed
+  */
+
 int _printf(const char *format, ...) {
-    va_list list_of_args;
-    va_start(list_of_args, format);
+  int total_char_to_print = 0;
+  va_list list_of_args;
 
-    int total_char_to_print = 0;
-    int stdout_fd = 1; 
+  if (format == NULL) {
+    return -1;
+  }
+  va_start(list_of_args, format);
 
-    while (*format != '\0') {
-        if (*format != '%') {
-            char character = *format;
-            if (write(stdout_fd, &character, 1) == -1) {
-            }
-            total_char_to_print++;
-        } else {
-            
-            switch (*++format) {
-            case 'd':
-                {
-                    int num = va_arg(list_of_args, int);
-                    int num_len = snprintf(NULL, 0, "%d", num);
-                    char num_str[num_len + 1];
-                    snprintf(num_str, num_len + 1, "%d", num);
-                    if (write(stdout_fd, num_str, num_len) == -1) {
-                    }
-                    total_char_to_print += num_len;
-                }
-                break;
-            case 'i':
-                {
-                    int num = va_arg(list_of_args, int);
-                    int num_len = snprintf(NULL, 0, "%i", num);
-                    char num_str[num_len + 1];
-                    snprintf(num_str, num_len + 1, "%i", num);
-                    if (write(stdout_fd, num_str, num_len) == -1) {
-                    }
-                    total_char_to_print += num_len;
-                }
-                break;
-            case 'c':
-                {
-                    char character = (char)va_arg(list_of_args, int);
-                    if (write(stdout_fd, &character, 1) == -1) {
-                    }
-                    total_char_to_print++;
-                }
-                break;
-            case 's':
-                {
-                    char *str = va_arg(list_of_args, char *);
-                    int str_len = strlen(str);
-                    if (write(stdout_fd, str, str_len) == -1) {
-                    }
-                    total_char_to_print += str_len;
-                }
-                break;
-            case 'f':
-                {
-                    double num = va_arg(list_of_args, double);
-                    int num_len = snprintf(NULL, 0, "%f", num);
-                    char num_str[num_len + 1];
-                    snprintf(num_str, num_len + 1, "%f", num);
-                    if (write(stdout_fd, num_str, num_len) == -1) {
-                    }
-                    total_char_to_print += num_len;
-                }
-                break;
-            default:
-                char percent = '%';
-                char current_format = *format;
-                if (write(stdout_fd, &percent, 1) == -1 ||     write(stdout_fd, &current_format, 1) == -1) {
-
-                }
-                total_char_to_print += 2;
-                break;
-            }
+  while (*format) {
+    if (*format != '%') {
+      int result = write(1, format, 1);
+      if (result == -1) {
+      }
+      total_char_to_print++;
+    } else {
+      format++;
+      if (*format == '\0') {
+        break;
+      }
+      if (*format == '%') {
+        int result = write(1, format, 1);
+        if (result == -1) {
         }
-        format++;
+        total_char_to_print++;
+      } else if (*format == 'c') {
+        char c = va_arg(list_of_args, int);
+        int result = write(1, &c , 1);
+        if (result == -1) {
+        }
+        total_char_to_print++; 
+      } else if (*format == 's') {
+        char *str = va_arg(list_of_args, char *);
+        int str_length = strlen(str);
+        int result = write(1, str, str_length);
+        if (result == -1) {
+        }
+        total_char_to_print += str_length;
+      } else if (*format == 'd' || *format == 'i') {
+        int num = va_arg(list_of_args, int);
+        char num_str[12];  // Assuming a maximum of 11 digits for an int
+        int num_length = sprintf(num_str, "%d", num);
+        int result = write(1, num_str, num_length);
+        if (result == -1) {
+        }
+        total_char_to_print += num_length;
+      }
     }
+    format++;
+  }
 
-    va_end(list_of_args);
-    return total_char_to_print;
+  va_end(list_of_args);
+  return total_char_to_print;
 }
