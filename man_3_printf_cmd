@@ -1,0 +1,36 @@
+tf(p, size, fmt, ap);
+           va_end(ap);
+
+           if (size < 0)
+               return NULL;
+
+           size++;             /* For '\0' */
+           p = malloc(size);
+           if (p == NULL)
+               return NULL;
+
+           va_start(ap, fmt);
+           size = vsnprintf(p, size, fmt, ap);
+           va_end(ap);
+
+           if (size < 0) {
+               free(p);
+               return NULL;
+           }
+
+           return p;
+       }
+
+       If truncation occurs in glibc versions prior to 2.0.6, this is treated as an error  in‐
+       stead of being handled gracefully.
+
+SEE ALSO
+       printf(1),  asprintf(3),  puts(3),  scanf(3),  setlocale(3),  strfromd(3),  wcrtomb(3),
+       wprintf(3), locale(5)
+
+COLOPHON
+       This page is part of release 5.05 of the Linux man-pages project.  A description of the
+       project,  information about reporting bugs, and the latest version of this page, can be
+       found at https://www.kernel.org/doc/man-pages/.
+
+

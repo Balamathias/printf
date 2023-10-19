@@ -1,77 +1,51 @@
 #include "main.h"
+#include <limits.h>
+#include <stdio.h>
 
 /**
- * _printf - Prints a formatted output.
- * @format: String containing the format specifiers.
- *
- * Return: The number of characters printed.
+ * _printf - produces output according to a format
+ * @format: format string containing the characters and the specifiers
+ * Description: this function will call my mb_get_print() function that will
+ * determine which printing function to call depending on the conversion
+ * specifiers contained into fmt
+ * Return: The lenght of the string format.
  */
-
 int _printf(const char *format, ...)
 {
-	int total_char_to_print = 0;
-	va_list list_of_args;
+	int (*pfunc)(va_list, flags_t *);
+	const char *p;
+	va_list mb_args;
+	flags_t flags = {0, 0, 0};
 
-	if (format == NULL)
-	{
+	register int mb_str_count = 0;
+
+	va_start(mb_args, format);
+	if (!format || (format[0] == '%' && !format[1]))
 		return (-1);
-	}
-	va_start(list_of_args, format);
-
-	while (*format)
+	if (format[0] == '%' && format[1] == ' ' && !format[2])
+		return (-1);
+	for (p = format; *p; p++)
 	{
-		if (*format != '%')
+		if (*p == '%')
 		{
-			int result = write(1, format, 1);
-			if (result == -1)
+			p++;
+			if (*p == '%')
 			{
-				/* Handle error if necessary */
+				mb_str_count += _putchar('%');
+				continue;
 			}
-			total_char_to_print++;
-		}
-		else
-		{
-			format++;
-			if (*format == '\0')
-			{
-				break;
-			}
-			if (*format == '%')
-			{
-				int result = write(1, format, 1);
-				if (result == -1)
-				{
-					/* Handle error if necessary */
-				}
-				total_char_to_print++;
-			}
-			else if (*format == 'c')
-			{
-				int character = va_arg(list_of_args, int);
-				char char_to_print = (char)character;
-				int result = write(1, &char_to_print, 1);
-				if (result == -1)
-				{
-					/* Handle error if necessary */
-				}
-				total_char_to_print++;
-			}
-			else if (*format == 's')
-			{
-				char *str = va_arg(list_of_args, char *);
-				int str_length = strlen(str);
-				int result = write(1, str, str_length);
-				if (result == -1)
-				{
-					/* Handle error if necessary */
-				}
-				total_char_to_print += str_length;
-			}
-		}
-		format++;
+			while (mb_get_flag(*p, &flags))
+				p++;
+			pfunc = mb_get_print(*p);
+			mb_str_count += (pfunc)
+				? pfunc(mb_args, &flags)
+				: _printf("%%%c", *p);
+		} else
+			mb_str_count += _putchar(*p);
 	}
+	_putchar(-1);
+	va_end(mb_args);
+	return (mb_str_count);
 
-	va_end(list_of_args);
-	return (total_char_to_print);
 }
 
